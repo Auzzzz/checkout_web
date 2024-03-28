@@ -4,7 +4,7 @@ import {
   type DefaultSession,
   type NextAuthOptions,
 } from "next-auth";
-import DiscordProvider from "next-auth/providers/discord";
+import FusionAuthProvider from "next-auth/providers/fusionauth"
 
 import { env } from "~/env";
 
@@ -45,19 +45,18 @@ export const authOptions: NextAuthOptions = {
     }),
   },
   providers: [
-    DiscordProvider({
-      clientId: env.DISCORD_CLIENT_ID,
-      clientSecret: env.DISCORD_CLIENT_SECRET,
+    FusionAuthProvider({
+      id: "fusionauth",
+      name: "FusionAuth",
+      issuer:  process.env.FUSIONAUTH_ISSUER,
+      clientId: process.env.FUSIONAUTH_CLIENT_ID || "",
+      clientSecret: process.env.FUSIONAUTH_SECRET || "",
+      // tenantId: process.env.FUSIONAUTH_TENANT_ID // Only required if you're using multi-tenancy
+       client: {
+        authorization_signed_response_alg: "HS256",
+        id_token_signed_response_alg: "HS256",
+       }
     }),
-    /**
-     * ...add more providers here.
-     *
-     * Most other providers require a bit more work than the Discord provider. For example, the
-     * GitHub provider requires you to add the `refresh_token_expires_in` field to the Account
-     * model. Refer to the NextAuth.js docs for the provider you want to use. Example:
-     *
-     * @see https://next-auth.js.org/providers/github
-     */
   ],
 };
 
