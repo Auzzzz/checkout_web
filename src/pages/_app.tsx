@@ -4,6 +4,7 @@ import { type AppType } from "next/app";
 import { Inter } from "next/font/google";
 
 import "~/styles/globals.css";
+import Navbar from "../components/navbar";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -16,6 +17,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
   return (
     <SessionProvider session={session}>
       <main className={inter.className}>
+        <Navbar />
         <Component {...pageProps} />
       </main>
     </SessionProvider>
