@@ -2,7 +2,6 @@ import Head from "next/head";
 import Link from "next/link";
 
 import styles from "./index.module.css";
-import LoginButton from "../components/login-btn";
 
 import { Grid } from "@mui/material";
 
@@ -17,7 +16,6 @@ export default function Home() {
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <h1 className={styles.title}>Welcome to the Checkout App</h1>
-          <LoginButton />
         </Grid>
       </Grid>
     </>

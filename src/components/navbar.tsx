@@ -13,10 +13,15 @@ import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
+import ChecklistIcon from "@mui/icons-material/Checklist";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
-const pages = ["Products", "Pricing", "Blog"];
+const pages = [
+  { id: "Home", path: "/" },
+  { id: "About", path: "/about" },
+  { id: "Contact", path: "/contact" },
+];
 const settings = [
   { id: "Profile", path: "/Profile" },
   { id: "Dashboard", path: "/Dashboard" },
@@ -49,7 +54,6 @@ function Navbar() {
   };
 
   const menuItemClick = (path: string) => {
-    console.log(path);
     setAnchorElUser(null);
 
     if (path === "/logout") {
@@ -63,12 +67,12 @@ function Navbar() {
     <AppBar position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
+          <ChecklistIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
           <Typography
             variant="h6"
             noWrap
             component="a"
-            href="#app-bar-with-responsive-menu"
+            href="/"
             sx={{
               mr: 2,
               display: { xs: "none", md: "flex" },
@@ -79,9 +83,9 @@ function Navbar() {
               textDecoration: "none",
             }}
           >
-            LOGO
+            Checkout
           </Typography>
-
+            {/* Small screen menu */}
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
             <IconButton
               size="large"
@@ -112,18 +116,22 @@ function Navbar() {
               }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography textAlign="center">{page}</Typography>
-                </MenuItem>
+                 <MenuItem
+                 key={page.id}
+                 onClick={() => menuItemClick(page.path)}
+               >
+                 <Typography textAlign="center">{page.id}</Typography>
+               </MenuItem>
               ))}
             </Menu>
           </Box>
-          <AdbIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
+          <ChecklistIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
+          {/* Small screen menu */}
           <Typography
             variant="h5"
             noWrap
             component="a"
-            href="#app-bar-with-responsive-menu"
+            href="/"
             sx={{
               mr: 2,
               display: { xs: "flex", md: "none" },
@@ -135,20 +143,20 @@ function Navbar() {
               textDecoration: "none",
             }}
           >
-            LOGO
+            Checkout
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
             {pages.map((page) => (
               <Button
-                key={page}
-                onClick={handleCloseNavMenu}
+                key={page.id}
+                onClick={() => menuItemClick(page.path)}
                 sx={{ my: 2, color: "white", display: "block" }}
               >
-                {page}
+                {page.id}
               </Button>
             ))}
           </Box>
-
+            {/* User Menu */}
           <Box sx={{ flexGrow: 0 }}>
             {session && session.user ? (
               <Box>
