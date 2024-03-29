@@ -207,7 +207,3 @@ function Navbar() {
   );
 }
 export default Navbar;
-
-function redirectTo(path: string) {
-  throw new Error("Function not implemented.");
-}
