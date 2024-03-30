@@ -36,13 +36,28 @@ declare module "next-auth" {
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    session: ({ session, token }) => ({
+    jwt({token, user, account}) {
+      return {...token, ...user, ...account}
+    }, 
+    session: ({ session, token, user}) => ({
       ...session,
       user: {
         ...session.user,
         id: token.sub,
+        raw: token
+
       },
     }),
+
+  // callbacks: {
+  //   async jwt({token, user}) {
+  //     return {...token, ...user}
+  //   }, 
+  //   async session({session, token, user}) {
+  //     session.user = token as any;
+  //     return session;
+  //   }
+    
   },
   providers: [
     FusionAuthProvider({
@@ -51,6 +66,7 @@ export const authOptions: NextAuthOptions = {
       issuer:  process.env.FUSIONAUTH_ISSUER,
       clientId: process.env.FUSIONAUTH_CLIENT_ID || "",
       clientSecret: process.env.FUSIONAUTH_SECRET || "",
+      idToken: true,
       // tenantId: process.env.FUSIONAUTH_TENANT_ID // Only required if you're using multi-tenancy
        client: {
         authorization_signed_response_alg: "HS256",

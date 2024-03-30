@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import DataTable from "../components/dataTable";
 import AddItems from "~/components/Dashboard/add/addItems";
 import DashDataTable from "~/components/Dashboard/dashDataTable";
+import { getToken } from "next-auth/jwt";
 
 const Dashboard = () => {
   const signedout = [{ id: 1, name: "John Doe", date: "12/1/1" }];
@@ -13,6 +14,8 @@ const Dashboard = () => {
     { id: 3, name: "Configure Groups" },
   ];
   const show = useState();
+
+
 
   return (
     <Grid item xs={12} container sx={{ textAlign: "center" }}>
@@ -34,5 +37,7 @@ const Dashboard = () => {
     </Grid>
   );
 };
+
+
 
 export default Dashboard;
