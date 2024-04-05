@@ -5,6 +5,7 @@ import { Inter } from "next/font/google";
 
 import "~/styles/globals.css";
 import Navbar from "../components/navbar";
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -19,6 +20,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
       <main className={inter.className}>
         <Navbar />
         <Component {...pageProps} />
+        <Toaster position="bottom-center" />
       </main>
     </SessionProvider>
   );

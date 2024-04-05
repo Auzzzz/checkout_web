@@ -18,17 +18,15 @@ function Dashboard() {
   const { data: session } = useSession();
   const [option, setOption] = useState(0);
   const actionButtons = [
-    { id: 0, name: "Configure Users", call: "/users"},
-    { id: 1, name: "Configure Items", call: "v1/item/all/f"},
-    { id: 2, name: "Configure Venues", call: "/items" },
-    { id: 3, name: "Configure Groups", call: "/items" },
+    { id: 0, name: "Configure Users"},
+    { id: 1, name: "Configure Items"},
+    { id: 2, name: "Configure Venues"},
+    { id: 3, name: "Configure Groups" },
   ];
 
   const buttonOnPress = (id: number) => {
     setOption(id);
   }
-
-  // getAPI("v1/item/all/f", session?.user.raw.access_token || "", session?.user.id || "");
 
   return (
     <Grid item xs={12} container sx={{ textAlign: "center" }}>

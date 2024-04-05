@@ -5,27 +5,10 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { postAPI, postAxiosAPI } from "~/server/postAPI";
 import { useSession } from "next-auth/react";
-
-export type Alert = {
-  id: number;
-  message: string;
-};
+import toast from "react-hot-toast";
 
 function AddItems() {
   const { data: session } = useSession();
-  const [alert, setAlert] = useState<Array<Alert>>([]);
-  const [success, setSuccess] = useState<Array<Alert>>([]);
-
-  const removeAlert = (index: number) => {
-    const temp = [...alert];
-    temp.splice(index, 1);
-    setAlert(temp);
-  };
-  const removeSuccess = (index: number) => {
-    const temp = [...success];
-    temp.splice(index, 1);
-    setSuccess(temp);
-  };
 
   const addItemsSchema = z.object({
     name: z
@@ -43,15 +26,9 @@ function AddItems() {
     register,
     handleSubmit,
     watch,
+    reset,
     formState: { errors, touchedFields },
   } = useForm<FormData>({ resolver: zodResolver(addItemsSchema) });
-  // const onSubmit = async (data: FormData) => {
-  //   const test = await postAPI(
-  //     "v1/item/",
-  //     session!.user.raw.access_token,
-  //     session!.user.id,
-  //     data
-  //   );
 
   const onSubmit = async (data: FormData) => {
     const post = await postAxiosAPI(
@@ -60,47 +37,20 @@ function AddItems() {
       session!.user.id,
       data
     );
-
+    reset();
     post;
     if (post?.status != 200 || post === undefined) {
-      setAlert([
-        ...alert,
-        { id: Math.random(), message: "Failed to add item - system issue" },
-      ]);
+      toast.error("Error adding item", { duration: 5000 });
     }
     if (post?.status == 200) {
-      setSuccess([
-        ...success,
-        {
-          id: Math.random(),
-          message: "Item " + post.data.id + " added",
-        },
-      ]);
+      toast.success("Successfully created " + post.data.id + " =)", {
+        duration: 5000,
+      });
     }
   };
 
   return (
     <Box>
-      {alert.map((alert) => (
-        <Alert
-          severity="error"
-          onClose={() => {
-            removeAlert(alert.id);
-          }}
-        >
-          {alert.message}
-        </Alert>
-      ))}
-      {success.map((success) => (
-        <Alert
-          severity="success"
-          onClose={() => {
-            removeSuccess(success.id);
-          }}
-        >
-          {success.message}
-        </Alert>
-      ))}
       <Typography variant="h5" sx={{ mb: 3 }}>
         Add an Item
       </Typography>
