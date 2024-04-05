@@ -18,6 +18,16 @@ declare module "next-auth" {
   interface Session extends DefaultSession {
     user: DefaultSession["user"] & {
       id: string;
+      raw: {
+        access_token: string;
+        expires_in: number;
+        refresh_expires_in: number;
+        refresh_token: string;
+        token_type: string;
+        "not-before-policy": number;
+        session_state: string;
+        scope: string;
+      };
       // ...other properties
       // role: UserRole;
     };
@@ -40,7 +50,7 @@ export const authOptions: NextAuthOptions = {
       return {...token, ...user, ...account}
     }, 
     session: ({ session, token, user}) => ({
-      ...session,
+      ...session, ...user, ...token,
       user: {
         ...session.user,
         id: token.sub,
@@ -48,16 +58,6 @@ export const authOptions: NextAuthOptions = {
 
       },
     }),
-
-  // callbacks: {
-  //   async jwt({token, user}) {
-  //     return {...token, ...user}
-  //   }, 
-  //   async session({session, token, user}) {
-  //     session.user = token as any;
-  //     return session;
-  //   }
-    
   },
   providers: [
     FusionAuthProvider({

@@ -38,8 +38,6 @@ function Navbar() {
   const { data: session } = useSession();
   const router = useRouter();
 
-  console.log(session);
-
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
   };

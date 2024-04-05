@@ -1,10 +1,32 @@
-import { Box, Button, TextField, Typography } from "@mui/material";
-import React from "react";
+import { Alert, Box, Button, TextField, Typography } from "@mui/material";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { zodResolver } from '@hookform/resolvers/zod';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { postAPI, postAxiosAPI } from "~/server/postAPI";
+import { useSession } from "next-auth/react";
+
+export type Alert = {
+  id: number;
+  message: string;
+};
 
 function AddItems() {
+  const { data: session } = useSession();
+  const [alert, setAlert] = useState<Array<Alert>>([]);
+  const [success, setSuccess] = useState<Array<Alert>>([]);
+
+  const removeAlert = (index: number) => {
+    const temp = [...alert];
+    temp.splice(index, 1);
+    setAlert(temp);
+  };
+  const removeSuccess = (index: number) => {
+    const temp = [...success];
+    temp.splice(index, 1);
+    setSuccess(temp);
+  };
+
   const addItemsSchema = z.object({
     name: z
       .string()
@@ -22,13 +44,63 @@ function AddItems() {
     handleSubmit,
     watch,
     formState: { errors, touchedFields },
-  } = useForm<FormData>({resolver: zodResolver(addItemsSchema)});
-  const onSubmit = (data: FormData) => {
-    console.log(data);
+  } = useForm<FormData>({ resolver: zodResolver(addItemsSchema) });
+  // const onSubmit = async (data: FormData) => {
+  //   const test = await postAPI(
+  //     "v1/item/",
+  //     session!.user.raw.access_token,
+  //     session!.user.id,
+  //     data
+  //   );
+
+  const onSubmit = async (data: FormData) => {
+    const post = await postAxiosAPI(
+      "v1/item/",
+      session!.user.raw.access_token,
+      session!.user.id,
+      data
+    );
+
+    post;
+    if (post?.status != 200 || post === undefined) {
+      setAlert([
+        ...alert,
+        { id: Math.random(), message: "Failed to add item - system issue" },
+      ]);
+    }
+    if (post?.status == 200) {
+      setSuccess([
+        ...success,
+        {
+          id: Math.random(),
+          message: "Item " + post.data.id + " added",
+        },
+      ]);
+    }
   };
 
   return (
     <Box>
+      {alert.map((alert) => (
+        <Alert
+          severity="error"
+          onClose={() => {
+            removeAlert(alert.id);
+          }}
+        >
+          {alert.message}
+        </Alert>
+      ))}
+      {success.map((success) => (
+        <Alert
+          severity="success"
+          onClose={() => {
+            removeSuccess(success.id);
+          }}
+        >
+          {success.message}
+        </Alert>
+      ))}
       <Typography variant="h5" sx={{ mb: 3 }}>
         Add an Item
       </Typography>
@@ -56,7 +128,12 @@ function AddItems() {
             helperText={errors.description?.message}
           />
 
-          <Button type="submit" variant="contained" color="primary" sx={{mt: 6}}>
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            sx={{ mt: 6 }}
+          >
             Add item
           </Button>
         </form>
@@ -66,4 +143,3 @@ function AddItems() {
 }
 
 export default AddItems;
-
