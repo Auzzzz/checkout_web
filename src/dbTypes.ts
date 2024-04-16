@@ -6,12 +6,14 @@ export type User = {
 
 }
 export type Items = {
+    item: {
     id: number;
     name: string;
     description: string;
     createdAt: Date;
     updatedAt: Date;
     GroupItems?:  GroupItems[];
+    }
 }
 
 export type Venue = {
