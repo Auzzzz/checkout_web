@@ -15,62 +15,9 @@ export default function ItemsDetail() {
   const { data: session } = useSession();
   const [itemData, setItemData] = useState<Items>();
   const [loading, setLoading] = useState(true);
-    console.log(router.query.id)
-  //   useEffect(() => {
-  //     const fetchData = async () => {
-  //         setLoading(true);
-  //       const url = "v1/item/" + id;
-  //       try {
-  //         const get = await getAPI(
-  //           url,
-  //           session!.user.raw.access_token,
-  //           session!.user.id
-  //         );
-
-  //         if (get === undefined || get.length === 0) {
-  //           toast.error("Error fetching data 1", { duration: 5000 });
-  //           return;
-  //         }
-  //         console.log(get)
-  //         setItemData(get);
-  //         setLoading(false);
-  //       } catch (error) {
-  //         console.log(error);
-  //         toast.error("Error fetching data 2" + error, { duration: 5000 });
-  //       }
-  //     };
-  //     fetchData();
-
-  //   }, [itemData]);
-  // useEffect(() => {
-  //     const getItems = async () => {
-
-  //         try {
-  //           const get = await getAPI(
-  //             "v1/item/" + 6,
-  //             session!.user.raw.access_token,
-  //             session!.user.id
-  //           );
-
-  //           if (get === undefined || get.length === 0) {
-  //             // toast.error("Error fetching data 1", { duration: 5000 });
-  //             console.log("no", get)
-  //             return;
-  //           }
-
-  //           console.log("yes",get)
-  //           setItemData(get);
-  //           setLoading(true);
-  //         } catch (error) {
-  //             console.log(error);
-  //             // toast.error("Error fetching data 2" + error, { duration: 5000 });
-  //             }
-
-  //     }
-  //     getItems();
-  // } , [])
 
   useEffect(() => {
+    // get id needs to be in useEffect
     const {id} = router.query
 
     if(!id) {
@@ -99,16 +46,7 @@ export default function ItemsDetail() {
         }
     }
     fetchData();
-    // fetch(`${process.env.NEXT_PUBLIC_API_URL + "v1/item/" + id}`)
-    //   .then((res) => res.json())
-    //   .then((data) => {
-    //     console.log("data",data)
-    //     setItemData(data);
-    //     setLoading(false);
-    //   }, error => {
-    //     console.log("error",error)
-    //     setLoading(false);
-    //   });
+
   }, [router]);
 
 

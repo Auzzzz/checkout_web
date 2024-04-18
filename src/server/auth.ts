@@ -1,10 +1,11 @@
+import axios from "axios";
 import { type GetServerSidePropsContext } from "next";
 import {
   getServerSession,
   type DefaultSession,
   type NextAuthOptions,
 } from "next-auth";
-import FusionAuthProvider from "next-auth/providers/fusionauth"
+import FusionAuthProvider from "next-auth/providers/fusionauth";
 
 import { env } from "~/env";
 
@@ -27,6 +28,7 @@ declare module "next-auth" {
         "not-before-policy": number;
         session_state: string;
         scope: string;
+        error: string;
       };
       // ...other properties
       // role: UserRole;
@@ -39,6 +41,49 @@ declare module "next-auth" {
   // }
 }
 
+// Token refresh API call
+
+async function refreshAccessToken(token: any) {
+  try {
+    const url = `${process.env.NEXT_PUBLIC_API_URL + 'v1/auth/refresh'}`
+    // console.log("refreshed token 1.5", token)
+    // console.log(url)
+    // const res: { ok: any; status: number; json: () => any; } = await fetch(url, {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({ refreshToken: token.refresh_token }),
+    // });
+
+
+    // Fetch does not work Axios does
+    const res = await axios.post(url, {
+      refreshToken: token.refresh_token,
+    });
+
+    if (res.status !== 200) {
+      console.log("error in auth JWT refresh", res);
+      return;
+    }
+
+    const data = res.data;
+
+    return {
+      ...token,
+      access_token: data.response.access_token, 
+      expires_in: data.response.expires_in, 
+      refresh_token: data.response.refresh_token ?? token.refreshToken,
+    };
+  } catch (error) {
+    console.log("token refresh error", error);
+  }
+  return {
+    ...token,
+    error: "RefreshAccessTokenError",
+  };
+}
+
 /**
  * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
  *
@@ -46,16 +91,36 @@ declare module "next-auth" {
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    jwt({token, user, account}) {
-      return {...token, ...user, ...account}
-    }, 
-    session: ({ session, token, user}) => ({
-      ...session, ...user, ...token,
+    jwt({ token, user, account }) {
+
+      if(account && user) {
+
+        return {
+          ...token,
+          ...user,
+          ...account,
+        };
+
+      }
+
+      if(Date.now() < (account?.expires_at ?? 0)) {
+        return { ...token, ...user, ...account };
+      }
+
+      // If the token is expired, refresh it
+      return refreshAccessToken(token);
+
+    },
+    session: ({ session, token, user }) => ({
+
+      ...session,
+      ...user,
+      ...token,
       user: {
         ...session.user,
         id: token.sub,
-        raw: token
-
+        raw: token,
+        error: token.error,
       },
     }),
   },
@@ -63,15 +128,15 @@ export const authOptions: NextAuthOptions = {
     FusionAuthProvider({
       id: "fusionauth",
       name: "FusionAuth",
-      issuer:  process.env.FUSIONAUTH_ISSUER,
+      issuer: process.env.FUSIONAUTH_ISSUER,
       clientId: process.env.FUSIONAUTH_CLIENT_ID || "",
       clientSecret: process.env.FUSIONAUTH_SECRET || "",
       idToken: true,
       // tenantId: process.env.FUSIONAUTH_TENANT_ID // Only required if you're using multi-tenancy
-       client: {
+      client: {
         authorization_signed_response_alg: "HS256",
         id_token_signed_response_alg: "HS256",
-       }
+      },
     }),
   ],
 };
