@@ -8,7 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 import React, { use, useEffect, useState } from "react";
-
+import { useRouter } from "next/router";
 import AddItems from "~/components/Dashboard/add/addItems";
 
 import { useSession } from "next-auth/react";
@@ -19,21 +19,19 @@ import AddVenues from "~/components/Dashboard/add/addVenues";
 import AddGroups from "~/components/Dashboard/add/addGroups";
 import toast from "react-hot-toast";
 
+
 function Dashboard() {
   const { data: session } = useSession();
   const [option, setOption] = useState(0);
   const [values, setValues] = useState([]);
   const error = useState(false);
+  const router = useRouter();
   const actionButtons = [
-    { id: 0, name: "Configure Users", ep: "v1/user" },
-    { id: 1, name: "Configure Items", ep: "v1/item" },
-    { id: 2, name: "Configure Venues", ep: "v1/venue" },
-    { id: 3, name: "Configure Groups", ep: "v1/group" },
+    { id: 0, name: "Configure Users", ep: "v1/user", idv: "Users" },
+    { id: 1, name: "Configure Items", ep: "v1/item", idv: "Items" },
+    { id: 2, name: "Configure Venues", ep: "v1/venue", idv: "Venues" },
+    { id: 3, name: "Configure Groups", ep: "v1/group", idv: "Groups" },
   ];
-
-  const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
 
   const selectionGetter = async (id: number) => {
     const url = actionButtons[id]!.ep + "/all/f";
@@ -63,42 +61,12 @@ function Dashboard() {
     selectionGetter(id);
   };
 
-  const model = (id: number) => {
-   
-      return (
-        <div>
-          <Button onClick={handleOpen}>Open modal</Button>
-          <Modal
-            open={open}
-            onClose={handleClose}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
-          >
-            <Box >
-              <Typography id="modal-modal-title" variant="h6" component="h2">
-                Text in a modal
-              </Typography>
-              <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-              </Typography>
-            </Box>
-          </Modal>
-        </div>
-      );
-    
+  const handleEdit = (id: number) => {
+    console.log("Edit Pressed");
+    const url = "" + actionButtons[option]!.ep + "/" + id;
+    router.push(actionButtons[option]!.idv + "/" + id);
   }
 
-  const style = {
-  position: 'absolute' as 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-};
 
   return (
     <Grid
@@ -137,8 +105,6 @@ function Dashboard() {
         </Box>
       </Grid>
 
-
-
       {values.map(
         (value: { id: number; name: string; description: string }) => (
           // <Typography key={value.id}>{value.name}</Typography>
@@ -172,7 +138,7 @@ function Dashboard() {
                   variant="contained"
                   color="primary"
                   sx={{ m: 1 }}
-                  onClick={() => handleOpen()}
+                  onClick={() => handleEdit(value.id)}
                 >
                   Modify {value.id}
                 </Button>
