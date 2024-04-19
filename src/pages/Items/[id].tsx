@@ -1,54 +1,55 @@
 import { Box, CircularProgress, Grid } from "@mui/material";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { get } from "node_modules/axios/index.cjs";
+
 import React, { use, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { getAPI } from "~/server/getAPI";
 import { Items } from "~/dbTypes";
-import { set } from "zod";
-import { error } from "console";
+
+import ModifyItems from "~/components/Dashboard/modify/modifyItems";
 
 export default function ItemsDetail() {
   const router = useRouter();
-//   const { id } = router.query;
+  //   const { id } = router.query;
+  const [completed, setCompleted] = useState(false);
+  const test = false
   const { data: session } = useSession();
   const [itemData, setItemData] = useState<Items>();
   const [loading, setLoading] = useState(true);
 
+  console.log(completed)
   useEffect(() => {
     // get id needs to be in useEffect
-    const {id} = router.query
+    const { id } = router.query;
 
-    if(!id) {
-        return;
-      }
+    if (!id) {
+      return;
+    }
 
     const fetchData = async () => {
-        const url = "v1/item/" + id;
-        try {
-            const get = await getAPI(
-            url,
-            session!.user.raw.access_token,
-            session!.user.id
-            );
-    
-            if (get === undefined || get.length === 0) {
-            toast.error("Error fetching data 1", { duration: 5000 });
-            return;
-            }
+      const url = "v1/item/" + id;
+      try {
+        const get = await getAPI(
+          url,
+          session!.user.raw.access_token,
+          session!.user.id
+        );
 
-            setItemData(get);
-            setLoading(false);
-        } catch (error) {
-
-            toast.error("Error fetching data 2" + error, { duration: 5000 });
+        if (get === undefined || get.length === 0) {
+          toast.error("Error fetching data 1", { duration: 5000 });
+          return;
         }
-    }
+       
+        toast.dismiss();
+        setItemData(get);
+        setLoading(false);
+      } catch (error) {
+        toast.error("Error fetching data 2" + error, { duration: 1000 });
+      }
+    };
     fetchData();
-
-  }, [router]);
-
+  }, [router, session, completed]);
 
   if (loading) {
     return (
@@ -63,7 +64,7 @@ export default function ItemsDetail() {
     );
   }
 
-  if (!itemData) {
+  if (!itemData || itemData.item === undefined || itemData.item === null) {
     return (
       <Box
         display="flex"
@@ -71,7 +72,7 @@ export default function ItemsDetail() {
         alignItems="center"
         minHeight="100vh"
       >
-        No Item found with ID #
+        No Item found
       </Box>
     );
   }
@@ -86,9 +87,11 @@ export default function ItemsDetail() {
           justifyContent="center"
           minHeight="100vh"
         >
-          <Box>
-            <h1>{itemData.item.name}</h1>
-            <p>{itemData.item.description}</p>
+          <Box sx={{ m: 2, px: 3 }}>
+            <h1>
+              {itemData.item.name} #{itemData.item.id}
+            </h1>
+            <ModifyItems itemData={itemData} onUpdate={() => setCompleted(true)} />
           </Box>
         </Grid>
       </Grid>

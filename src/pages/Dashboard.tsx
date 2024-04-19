@@ -135,6 +135,7 @@ function Dashboard() {
 
               <Grid item xs={3} md={4}>
                 <Button
+                key={value.id}
                   variant="contained"
                   color="primary"
                   sx={{ m: 1 }}
