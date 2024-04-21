@@ -18,11 +18,13 @@ import AddUsers from "~/components/Dashboard/add/addUsers";
 import AddVenues from "~/components/Dashboard/add/addVenues";
 import AddGroups from "~/components/Dashboard/add/addGroups";
 import toast from "react-hot-toast";
+import { set } from "zod";
 
 
 function Dashboard() {
   const { data: session } = useSession();
   const [option, setOption] = useState(0);
+  const [loading, setLoading] = useState(false);
   const [values, setValues] = useState([]);
   const error = useState(false);
   const router = useRouter();
@@ -34,7 +36,8 @@ function Dashboard() {
   ];
 
   const selectionGetter = async (id: number) => {
-    const url = actionButtons[id]!.ep + "/all/f";
+    setLoading(true);
+    const url = actionButtons[id]!.ep + "/all";
 
     try {
       const get = await getAPI(
@@ -43,30 +46,29 @@ function Dashboard() {
         session!.user.id
       );
 
-      if (get === undefined || get.length === 0) {
+      if (get.length === 0 || get === undefined || get === null) {
         toast.error("Error fetching data 1", { duration: 5000 });
+        setLoading(false);
         return;
       }
-
+      setLoading(false);
       setValues(get);
     } catch (error) {
       console.log(error);
+      setLoading(false);
       toast.error("Error fetching data 2" + error, { duration: 5000 });
     }
   };
 
   const buttonOnPress = (id: number) => {
-    console.log("Button Pressed");
+    setValues([]);
     setOption(id);
     selectionGetter(id);
   };
 
   const handleEdit = (id: number) => {
-    console.log("Edit Pressed");
-    const url = "" + actionButtons[option]!.ep + "/" + id;
     router.push(actionButtons[option]!.idv + "/" + id);
   }
-
 
   return (
     <Grid
@@ -84,6 +86,7 @@ function Dashboard() {
             color="primary"
             key={action.id}
             onClick={() => buttonOnPress(action.id)}
+            disabled={loading}
           >
             {action.name}
           </Button>
@@ -105,7 +108,7 @@ function Dashboard() {
         </Box>
       </Grid>
 
-      {values.map(
+      {values.length && values.map(
         (value: { id: number; name: string; description: string }) => (
           // <Typography key={value.id}>{value.name}</Typography>
 

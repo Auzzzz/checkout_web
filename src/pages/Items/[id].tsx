@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Grid } from "@mui/material";
+import { Box, Button, CircularProgress, Grid } from "@mui/material";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 
@@ -18,7 +18,6 @@ export default function ItemsDetail() {
   const [itemData, setItemData] = useState<Items>();
   const [loading, setLoading] = useState(true);
 
-  console.log(completed)
   useEffect(() => {
     // get id needs to be in useEffect
     const { id } = router.query;
@@ -87,6 +86,7 @@ export default function ItemsDetail() {
           justifyContent="center"
           minHeight="100vh"
         >
+          <Button onClick={() => router.back()}>Back</Button>
           <Box sx={{ m: 2, px: 3 }}>
             <h1>
               {itemData.item.name} #{itemData.item.id}
