@@ -35,6 +35,8 @@ function Dashboard() {
     { id: 3, name: "Configure Groups", ep: "v1/group", idv: "Groups" },
   ];
 
+
+  console.log(values);
   const selectionGetter = async (id: number) => {
     setLoading(true);
     const url = actionButtons[id]!.ep + "/all";
@@ -78,7 +80,9 @@ function Dashboard() {
       alignItems="stretch"
       sx={{ textAlign: "center" }}
     >
+      
       <Grid item xs={12}>
+      <p>{session?.user.raw.access_token}</p>
         {actionButtons.map((action) => (
           <Button
             sx={{ m: 1 }}
@@ -119,7 +123,7 @@ function Dashboard() {
               md={7}
               xs={12}
               container
-              sx={{ mt: 2, px: 3, bgcolor: "red", p: 2 }}
+              sx={{ mt: 2, px: 3, bgcolor: "#ADABB0", p: 2 }}
               display="flex"
               wrap="nowrap"
             >
@@ -131,8 +135,9 @@ function Dashboard() {
                 md={7}
                 sx={{ mr: 1 }}
               >
-                {value.id}
-                {value.name}
+                <Box sx={{}}>
+                <Typography variant="h5">#{value.id} - {value.name}</Typography>
+                </Box>
                 {value.description}1
               </Grid>
 

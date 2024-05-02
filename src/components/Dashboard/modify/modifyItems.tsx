@@ -1,5 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Box, Button, Grid, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Divider,
+  Grid,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useSession } from "next-auth/react";
 import { SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -10,17 +17,15 @@ import { postAxiosAPI } from "~/server/postAPI";
 import { putAxiosAPI } from "~/server/putAPI";
 
 type Props = {
-    itemData: Items;
-    onUpdate: () => void;
-}
-
+  itemData: Items;
+  onUpdate: () => void;
+};
 
 function ModifyItems(props: Props) {
   const { data: session } = useSession();
   const [disable, setDisable] = useState(false);
 
   const modifyItemsSchema = z.object({
-    
     name: z
       .string()
       .min(2, "Must be longer then 2 characters")
@@ -38,7 +43,13 @@ function ModifyItems(props: Props) {
     watch,
 
     formState: { errors, touchedFields, isDirty },
-  } = useForm<FormData>({ resolver: zodResolver(modifyItemsSchema), defaultValues: { name: props.itemData.item.name, description: props.itemData.item.description }});
+  } = useForm<FormData>({
+    resolver: zodResolver(modifyItemsSchema),
+    defaultValues: {
+      name: props.itemData.item.name,
+      description: props.itemData.item.description,
+    },
+  });
 
   const onSubmit = async (data: FormData) => {
     if (!isDirty) {
@@ -50,15 +61,15 @@ function ModifyItems(props: Props) {
     // add in ID to the data
     const modifiedData = { ...data, id: props.itemData.item.id };
     const post = await putAxiosAPI(
-        "v1/item/",
-        session!.user.raw.access_token,
-        session!.user.id,
-        modifiedData
+      "v1/item/",
+      session!.user.raw.access_token,
+      session!.user.id,
+      modifiedData
     );
     post;
     if (post?.status !== 200 || post === undefined) {
-        toast.error("Error modifying item", { duration: 5000 });
-        setDisable(false);
+      toast.error("Error modifying item", { duration: 5000 });
+      setDisable(false);
     }
     if (post?.status == 200) {
       toast.success("Successfully modified " + post.data.id + " =)", {
@@ -105,6 +116,28 @@ function ModifyItems(props: Props) {
             Modify item
           </Button>
         </form>
+
+        <Divider sx={{ mt: 4 }} />
+        <Box>
+          {props.itemData.item.GroupItems?.length! < 1 ? (
+            <Typography variant="body1" sx={{ mt: 2 }}>
+              No groups assigned
+            </Typography>
+          ) : (
+            <Typography variant="body1" sx={{ mt: 2 }}>
+              Item {props.itemData.item.name} is in the following groups:
+            </Typography>
+          )}
+
+          {props.itemData.item.GroupItems?.map((group) => (
+            <Box key={group.group.id}>
+              <Typography variant="body1" sx={{ mt: 2 }}>
+                #{group.group.id} - {group.group.name}
+                {/* TODO: Add a button to take to the group page */}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
       </Box>
     </Grid>
   );
