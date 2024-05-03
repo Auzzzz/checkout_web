@@ -15,12 +15,14 @@ export type Items = {
 };
 
 export type Venue = {
+  venue: {
   id: number;
   name: string;
   description: string;
   createdAt: Date;
   updatedAt: Date;
-  GroupVenues?: number;
+  GroupVenues?: [GroupInVenues];
+  }
 };
 
 export type Department = {
@@ -50,8 +52,11 @@ export type Group = {
 
 export type GroupInItems = {
 group: Group
-
 }
+
+export type GroupInVenues = {
+  group: Group
+  }
 
 export type GroupMembers = {
   id: number;

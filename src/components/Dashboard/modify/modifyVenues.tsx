@@ -12,16 +12,16 @@ import { SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
-import { Items } from "~/dbTypes";
+import { Venue } from "~/dbTypes";
 import { postAxiosAPI } from "~/server/postAPI";
 import { putAxiosAPI } from "~/server/putAPI";
 
 type Props = {
-  itemData: Items;
+  data: Venue;
   onUpdate: () => void;
 };
 
-function ModifyItems(props: Props) {
+function ModifyVenues(props: Props) {
   const { data: session } = useSession();
   const [disable, setDisable] = useState(false);
 
@@ -46,8 +46,8 @@ function ModifyItems(props: Props) {
   } = useForm<FormData>({
     resolver: zodResolver(modifySchema),
     defaultValues: {
-      name: props.itemData.item.name,
-      description: props.itemData.item.description,
+      name: props.data.venue.name,
+      description: props.data.venue.description,
     },
   });
 
@@ -59,7 +59,7 @@ function ModifyItems(props: Props) {
 
     setDisable(true);
     // add in ID to the data
-    const modifiedData = { ...data, id: props.itemData.item.id };
+    const modifiedData = { ...data, id: props.data.venue.id };
     const post = await putAxiosAPI(
       "v1/item/",
       session!.user.raw.access_token,
@@ -80,6 +80,8 @@ function ModifyItems(props: Props) {
     }
   };
 
+  props.data.venue.GroupVenues?.map((group) => (console.log(group.group.id)));
+
   return (
     <Grid item xs={12}>
       <Box>
@@ -88,7 +90,7 @@ function ModifyItems(props: Props) {
             style={{ width: "100%" }}
             id="item-name"
             label="Item Name"
-            defaultValue={props.itemData.item.name}
+            defaultValue={props.data.venue.name}
             variant="standard"
             {...register("name")}
             error={!!errors.name}
@@ -100,7 +102,7 @@ function ModifyItems(props: Props) {
             style={{ width: "100%", marginTop: 8 }}
             id="item-description"
             label="Item Description"
-            defaultValue={props.itemData.item.description}
+            defaultValue={props.data.venue.description}
             variant="standard"
             {...register("description")}
             error={!!errors.description}
@@ -113,34 +115,40 @@ function ModifyItems(props: Props) {
             color="primary"
             sx={{ mt: 6 }}
           >
-            Modify item
+            Modify Venue
           </Button>
         </form>
 
         <Divider sx={{ mt: 4 }} />
         <Box>
-          {props.itemData.item.GroupItems?.length! < 1 ? (
+          {props.data.venue.GroupVenues?.length! < 1 ? (
             <Typography variant="body1" sx={{ mt: 2 }}>
               No groups assigned
             </Typography>
           ) : (
             <Typography variant="body1" sx={{ mt: 2 }}>
-              Item {props.itemData.item.name} is in the following groups:
+              Item {props.data.venue.name} is in the following groups:
             </Typography>
           )}
 
-          {props.itemData.item.GroupItems?.map((group) => (
+          {props.data.venue.GroupVenues?.length! >= 1 ? (
+           props.data.venue.GroupVenues?.map((group) => (
+               
             <Box key={group.group.id}>
               <Typography variant="body1" sx={{ mt: 2 }}>
                 #{group.group.id} - {group.group.name}
                 {/* TODO: Add a button to take to the group page */}
               </Typography>
             </Box>
-          ))}
+            ))
+          ) : (
+            <p> No groups assigned</p>
+          )}
+
         </Box>
       </Box>
     </Grid>
   );
 }
 
-export default ModifyItems;
+export default ModifyVenues;
