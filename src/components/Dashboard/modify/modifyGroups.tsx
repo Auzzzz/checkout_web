@@ -12,18 +12,20 @@ import { SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
-import { Venue } from "~/dbTypes";
+import { EntireGroup } from "~/dbTypes";
 import { postAxiosAPI } from "~/server/postAPI";
 import { putAxiosAPI } from "~/server/putAPI";
 
 type Props = {
-  data: Venue;
+  GroupData: EntireGroup;
   onUpdate: () => void;
 };
 
-function ModifyVenues(props: Props) {
+function ModifyGroups(props: Props) {
   const { data: session } = useSession();
   const [disable, setDisable] = useState(false);
+
+  console.log(props.GroupData.GroupDepartments);
 
   const modifySchema = z.object({
     name: z
@@ -46,8 +48,8 @@ function ModifyVenues(props: Props) {
   } = useForm<FormData>({
     resolver: zodResolver(modifySchema),
     defaultValues: {
-      name: props.data.venue.name,
-      description: props.data.venue.description,
+      name: props.GroupData.name,
+      description: props.GroupData.description,
     },
   });
 
@@ -59,9 +61,10 @@ function ModifyVenues(props: Props) {
 
     setDisable(true);
     // add in ID to the data
-    const modifiedData = { ...data, id: props.data.venue.id };
+    const modifiedData = { ...data, id: props.GroupData.id };
+    console.log(modifiedData);
     const post = await putAxiosAPI(
-      "v1/item/",
+      "v1/group/",
       session!.user.raw.access_token,
       session!.user.id,
       modifiedData
@@ -88,7 +91,7 @@ function ModifyVenues(props: Props) {
             style={{ width: "100%" }}
             id="item-name"
             label="Item Name"
-            defaultValue={props.data.venue.name}
+            defaultValue={props.GroupData.name}
             variant="standard"
             {...register("name")}
             error={!!errors.name}
@@ -100,7 +103,7 @@ function ModifyVenues(props: Props) {
             style={{ width: "100%", marginTop: 8 }}
             id="item-description"
             label="Item Description"
-            defaultValue={props.data.venue.description}
+            defaultValue={props.GroupData.description}
             variant="standard"
             {...register("description")}
             error={!!errors.description}
@@ -113,40 +116,34 @@ function ModifyVenues(props: Props) {
             color="primary"
             sx={{ mt: 6 }}
           >
-            Modify Venue
+            Modify item
           </Button>
         </form>
 
         <Divider sx={{ mt: 4 }} />
         <Box>
-          {props.data.venue.GroupVenues?.length! < 1 ? (
+          {props.GroupData.GroupDepartments?.length! < 1 ? (
             <Typography variant="body1" sx={{ mt: 2 }}>
               No groups assigned
             </Typography>
           ) : (
             <Typography variant="body1" sx={{ mt: 2 }}>
-              Item {props.data.venue.name} is in the following groups:
+             {props.GroupData.name} is in the following Departments:
             </Typography>
           )}
 
-          {props.data.venue.GroupVenues?.length! >= 1 ? (
-           props.data.venue.GroupVenues?.map((group) => (
-               
-            <Box key={group.group.id}>
+
+          {props.GroupData.GroupDepartments?.map((group) => (
+            <Box key={group.id}>
               <Typography variant="body1" sx={{ mt: 2 }}>
-                #{group.group.id} - {group.group.name}
-                {/* TODO: Add a button to take to the group page */}
+                #{group.id} - {group.name}
               </Typography>
             </Box>
-            ))
-          ) : (
-            <p> No groups assigned</p>
-          )}
-
+          ))}
         </Box>
       </Box>
     </Grid>
   );
 }
 
-export default ModifyVenues;
+export default ModifyGroups;

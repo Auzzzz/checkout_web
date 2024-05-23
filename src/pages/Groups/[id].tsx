@@ -5,17 +5,17 @@ import { useRouter } from "next/router";
 import React, { use, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { getAPI } from "~/server/getAPI";
-import { Items, Venue } from "~/dbTypes";
+import { EntireGroup } from "~/dbTypes";
+import ModifyGroups from "~/components/Dashboard/modify/modifyGroups";
 
-import ModifyVenues from "~/components/Dashboard/modify/modifyVenues";
 
-export default function ItemsDetail() {
+export default function GroupsDetail() {
   const router = useRouter();
   //   const { id } = router.query;
   const [completed, setCompleted] = useState(false);
   const test = false
   const { data: session } = useSession();
-  const [data, setData] = useState<Venue>();
+  const [groupData, setGroupData] = useState<EntireGroup>();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,7 +27,7 @@ export default function ItemsDetail() {
     }
 
     const fetchData = async () => {
-      const url = "v1/venue/" + id;
+      const url = "v1/group/" + id;
       try {
         const get = await getAPI(
           url,
@@ -39,9 +39,9 @@ export default function ItemsDetail() {
           toast.error("Error fetching data 1", { duration: 5000 });
           return;
         }
-       
+
         toast.dismiss();
-        setData(get);
+        setGroupData(get);
         setLoading(false);
       } catch (error) {
         toast.error("Error fetching data 2" + error, { duration: 1000 });
@@ -63,7 +63,7 @@ export default function ItemsDetail() {
     );
   }
 
-  if (!data || data.venue === undefined || data.venue === null) {
+  if (!groupData || groupData.name === undefined || groupData.name === null) {
     return (
       <Box
         display="flex"
@@ -89,9 +89,9 @@ export default function ItemsDetail() {
           <Button onClick={() => router.back()}>Back</Button>
           <Box sx={{ m: 2, px: 3 }}>
             <h1>
-              {data.venue.name} #{data.venue.id}
+              {groupData.name} #{groupData.id}
             </h1>
-            <ModifyVenues data={data} onUpdate={() => setCompleted(true)} />
+            <ModifyGroups GroupData={groupData} onUpdate={() => setCompleted(true)} />
           </Box>
         </Grid>
       </Grid>

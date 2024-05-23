@@ -107,9 +107,9 @@ export type EntireGroup = {
   description: string;
   id: number;
   name: string;
-  GroupItems?: GroupItems[];
+  GroupItems?: Items[];
   GroupMembers?: GroupMembers[];
-  GroupVenues?: GroupVenues[];
-  GroupDepartments?: GroupDepartments[];
+  GroupVenues?: Venue[];
+  GroupDepartments?: Department[];
   Group_Flags: Group_Flags[];
 };
